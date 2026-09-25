@@ -1,0 +1,27 @@
+# Binaries
+/bin/
+*.exe
+*.out
+
+# Go
+/vendor/
+go.work.sum
+
+# Env / secrets
+.env
+*.local
+
+# Data volumes (docker-compose mounts)
+/.data/
+
+# Editor
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+
+# Test / coverage
+coverage.out
+*.test
