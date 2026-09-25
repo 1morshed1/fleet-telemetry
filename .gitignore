@@ -2,6 +2,11 @@
 /bin/
 *.exe
 *.out
+# Stray binaries from `go build ./cmd/<x>` without -o (output lands in CWD)
+/simulator
+/ingestion
+/processor
+/dashboard
 
 # Go
 /vendor/
