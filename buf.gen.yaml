@@ -1,0 +1,15 @@
+version: v2
+managed:
+  enabled: false
+plugins:
+  # Generates the message structs (.pb.go). Output rooted at repo so the
+  # go_package path maps onto proto/fleet/v1/.
+  - local: protoc-gen-go
+    out: proto
+    opt:
+      - paths=source_relative
+  # Generates the gRPC client/server stubs (_grpc.pb.go).
+  - local: protoc-gen-go-grpc
+    out: proto
+    opt:
+      - paths=source_relative
