@@ -114,6 +114,9 @@ services:
       REDIS_ADDR: "redis:6379"
       WEB_DIR: "/app/web"
       BROADCAST_INTERVAL: "1s"
+    volumes:
+      # Serve the live web/ dir so front-end edits show up without a rebuild.
+      - ./web:/app/web:ro
     ports:
       - "8080:8080"
     depends_on:

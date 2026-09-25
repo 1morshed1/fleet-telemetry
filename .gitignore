@@ -22,6 +22,9 @@ go.work.sum
 # OS
 .DS_Store
 
+# Playwright MCP scratch output
+.playwright-mcp/
+
 # Test / coverage
 coverage.out
 *.test

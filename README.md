@@ -8,6 +8,11 @@ This repo is built as a **learning project**. Every phase has a companion docume
 [`docs/`](docs/) that explains *what* was built, *why* the decisions were made, and the
 trade-offs behind them. Read the docs in order — they are the point.
 
+![Live dashboard: 800 vehicles over Berlin, red = geofence/speed violations](docs/images/dashboard.png)
+
+*Live map: 800 simulated vehicles streaming through the pipeline; the red cluster is inside the
+restricted geofence; the side panel is the live alert feed.*
+
 ```
 Simulator ──gRPC stream──▶ Ingestion ──▶ Kafka ──▶ Processor ──▶ TimescaleDB
   (Go)                       (Go)                     (Go)          (Postgres+
@@ -69,4 +74,14 @@ Start here → [`docs/README.md`](docs/README.md)
 
 ## Status
 
-Built phase by phase. See git history and the per-phase docs for what is done.
+**Complete and verified end to end.** All phases built, containerized, and run together via
+`docker compose`. Verified: simulator → ingestion → Kafka → processor → TimescaleDB, with H3
+geofencing + speed detection, live positions over Redis→WebSocket, REST history queries, and
+Prometheus/Grafana metrics. A representative run: 800 vehicles, 100% of consumed pings written
+(no loss), speed + geofence alerts firing, live map updating.
+
+Deployment manifests (Kustomize base + dev/prod overlays, ArgoCD Application) are provided and
+render cleanly; running them on a real cluster is optional (Minikube instructions in
+[docs/09](docs/09-kubernetes-gitops.md)).
+
+Built phase by phase — see git history and the per-phase docs for the reasoning behind each step.

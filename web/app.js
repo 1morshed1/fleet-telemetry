@@ -7,8 +7,9 @@
 const CENTER = [52.52, 13.405];
 const map = L.map('map', { zoomControl: true }).setView(CENTER, 11);
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; OpenStreetMap &copy; CARTO',
+// Keyless OpenStreetMap tiles (CARTO's dark basemap now requires an API key).
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors',
   maxZoom: 19,
 }).addTo(map);
 
