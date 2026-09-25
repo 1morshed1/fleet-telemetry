@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: fleet
+
+resources:
+  - namespace.yaml
+  - infra.yaml
+  - ingestion.yaml
+  - processor.yaml
+  - dashboard.yaml
+
+# The schema + seed SQL become a ConfigMap mounted into TimescaleDB's init dir,
+# so the same files that drive docker-compose also initialize the cluster DB.
+configMapGenerator:
+  - name: db-init
+    files:
+      - ../../../db/init/01-schema.sql
+      - ../../../db/init/02-seed-geofences.sql
+
+# One image for all services; overlays/CI override the tag (and registry).
+images:
+  - name: fleet-telemetry
+    newTag: latest

@@ -1,0 +1,27 @@
+# ArgoCD Application: the GitOps entry point. ArgoCD watches the Git repo path
+# below and keeps the cluster in sync with it. To deploy, you `kubectl apply` this
+# ONE manifest into the argocd namespace; everything else flows from Git.
+#
+# Change the repoURL to your fork. In a real setup the K8s manifests live in a
+# SEPARATE gitops repo (see ADR-0001); here they're in-repo under deploy/k8s for
+# a single-clone learning experience.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fleet-telemetry
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/1morshed1/fleet-telemetry.git
+    targetRevision: main
+    path: deploy/k8s/overlays/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: fleet
+  syncPolicy:
+    automated:
+      prune: true      # delete resources removed from Git
+      selfHeal: true   # revert manual cluster changes back to Git state
+    syncOptions:
+      - CreateNamespace=true

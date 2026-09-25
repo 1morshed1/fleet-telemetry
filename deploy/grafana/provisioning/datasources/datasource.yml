@@ -1,0 +1,10 @@
+# Auto-provision the Prometheus datasource so Grafana works with no clicking.
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    type: prometheus
+    uid: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true

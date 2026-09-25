@@ -38,6 +38,12 @@ var (
 	dbErrors = promauto.NewCounter(prometheus.CounterOpts{
 		Name: "processor_db_errors_total", Help: "Database write errors.",
 	})
+	liveErrors = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "processor_live_publish_errors_total", Help: "Redis publish errors (live positions).",
+	})
+	liveDropped = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "processor_live_dropped_total", Help: "Live positions dropped due to a full publish buffer.",
+	})
 )
 
 // vehicleState is the per-vehicle memory needed for stateful processing: the
@@ -79,7 +85,8 @@ type Processor struct {
 	rdb    *redis.Client
 	cfg    Config
 
-	state map[string]*vehicleState
+	state  map[string]*vehicleState
+	liveCh chan live.Position // decouples Redis publishing from the hot path
 }
 
 // New builds a processor. The geofence index is loaded once by the caller and
@@ -87,7 +94,8 @@ type Processor struct {
 func New(reader *kafka.Reader, st EventStore, idx *geofence.Index, rdb *redis.Client, cfg Config) *Processor {
 	return &Processor{
 		reader: reader, store: st, geo: idx, rdb: rdb, cfg: cfg,
-		state: make(map[string]*vehicleState),
+		state:  make(map[string]*vehicleState),
+		liveCh: make(chan live.Position, 10_000),
 	}
 }
 
@@ -96,6 +104,11 @@ func New(reader *kafka.Reader, st EventStore, idx *geofence.Index, rdb *redis.Cl
 // size or interval — the same batching pattern as ingestion, applied to writes.
 func (p *Processor) Run(ctx context.Context) error {
 	pingCh := make(chan *fleetv1.GPSPing, 10_000)
+
+	// Publisher goroutine: drains liveCh and pushes to Redis with a bounded
+	// timeout. Kept OFF the hot path so a slow/absent Redis can never stall
+	// enrichment or DB writes (handle() only does a non-blocking channel send).
+	go p.runPublisher(ctx)
 
 	// Reader goroutine.
 	go func() {
@@ -219,8 +232,8 @@ func (p *Processor) handle(ctx context.Context, ping *fleetv1.GPSPing) store.Eve
 
 	st.lastLat, st.lastLng, st.lastTime, st.hasPrev = lat, lng, t, true
 
-	// --- Publish live position (fire-and-forget) ---
-	p.publishLive(ctx, live.Position{
+	// --- Publish live position (fire-and-forget, off the hot path) ---
+	p.publishLive(live.Position{
 		VehicleID: vid, Lat: lat, Lng: lng,
 		SpeedKmh: calcSpeed, Heading: ping.GetHeading(),
 		Status: status, TimeMs: ping.GetTimestampUnixMs(),
@@ -232,16 +245,40 @@ func (p *Processor) handle(ctx context.Context, ping *fleetv1.GPSPing) store.Eve
 	}
 }
 
-func (p *Processor) publishLive(ctx context.Context, pos live.Position) {
+// publishLive hands a position to the publisher goroutine without blocking. If
+// the buffer is full (Redis is slow/down), the update is dropped — live data is
+// best-effort; the durable copy is already in TimescaleDB.
+func (p *Processor) publishLive(pos live.Position) {
 	if p.rdb == nil {
 		return
 	}
-	b, err := json.Marshal(pos)
-	if err != nil {
+	select {
+	case p.liveCh <- pos:
+	default:
+		liveDropped.Inc()
+	}
+}
+
+// runPublisher drains liveCh and publishes to Redis, bounding each publish so a
+// broker problem cannot wedge the goroutine.
+func (p *Processor) runPublisher(ctx context.Context) {
+	if p.rdb == nil {
 		return
 	}
-	// Best-effort: a slow/absent Redis must not stall processing.
-	if err := p.rdb.Publish(ctx, live.Channel, b).Err(); err != nil {
-		// Log sparsely to avoid noise; this is non-critical.
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case pos := <-p.liveCh:
+			b, err := json.Marshal(pos)
+			if err != nil {
+				continue
+			}
+			pctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+			if err := p.rdb.Publish(pctx, live.Channel, b).Err(); err != nil {
+				liveErrors.Inc()
+			}
+			cancel()
+		}
 	}
 }

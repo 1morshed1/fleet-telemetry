@@ -1,0 +1,64 @@
+# Ingestion is stateless -> a plain Deployment that scales horizontally.
+# An HPA scales it on CPU; in production you might scale on the custom metric
+# ingestion_queue_depth instead (via prometheus-adapter).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingestion
+  labels: { app: ingestion }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: ingestion }
+  template:
+    metadata:
+      labels: { app: ingestion }
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "2112"
+    spec:
+      containers:
+        - name: ingestion
+          image: fleet-telemetry:latest # overlays/CI set the real registry+tag
+          args: ["ingestion"]
+          env:
+            - { name: GRPC_ADDR, value: ":50051" }
+            - { name: METRICS_ADDR, value: ":2112" }
+            - { name: KAFKA_BROKERS, value: "redpanda:9092" }
+          ports:
+            - { name: grpc, containerPort: 50051 }
+            - { name: metrics, containerPort: 2112 }
+          readinessProbe:
+            httpGet: { path: /healthz, port: 2112 }
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources:
+            requests: { cpu: "100m", memory: "64Mi" }
+            limits: { cpu: "500m", memory: "256Mi" }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingestion
+spec:
+  selector: { app: ingestion }
+  ports:
+    - { name: grpc, port: 50051, targetPort: 50051 }
+    - { name: metrics, port: 2112, targetPort: 2112 }
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ingestion
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ingestion
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: { type: Utilization, averageUtilization: 70 }

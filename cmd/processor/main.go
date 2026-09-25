@@ -18,6 +18,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/redis/go-redis/v9"
@@ -58,8 +59,15 @@ func main() {
 	log.Printf("processor: loaded %d geofences -> %d H3 cells (res %d)",
 		len(zones), idx.NumCells(), geofence.DefaultResolution)
 
-	// Redis for live position fan-out.
-	rdb := redis.NewClient(&redis.Options{Addr: redisAddr})
+	// Redis for live position fan-out. Fail fast: live data is best-effort, so a
+	// slow/unavailable Redis should error quickly rather than pile up retries.
+	rdb := redis.NewClient(&redis.Options{
+		Addr:         redisAddr,
+		DialTimeout:  2 * time.Second,
+		ReadTimeout:  2 * time.Second,
+		WriteTimeout: 2 * time.Second,
+		MaxRetries:   1,
+	})
 	defer rdb.Close()
 
 	// Kafka consumer.

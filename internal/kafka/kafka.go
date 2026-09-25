@@ -35,6 +35,10 @@ func NewWriter(brokers []string, topic string) *kafka.Writer {
 		BatchSize:    500,
 		BatchTimeout: 100 * time.Millisecond,
 		Async:        false,
+		// Create the topic on first write if it doesn't exist yet. A topics-init
+		// step also pre-creates topics with a chosen partition count; this is a
+		// safety net so a fresh cluster never wedges the pipeline.
+		AllowAutoTopicCreation: true,
 	}
 }
 

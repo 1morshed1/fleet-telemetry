@@ -1,0 +1,40 @@
+# Processor is a Kafka consumer group member. Scale by adding replicas: Kafka
+# reassigns partitions across them. gps-pings has 6 partitions, so up to 6
+# processors do useful work in parallel. Because pings are keyed by vehicle_id,
+# each vehicle stays on one partition -> one processor -> correct per-vehicle
+# speed state without any shared store.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: processor
+  labels: { app: processor }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: processor }
+  template:
+    metadata:
+      labels: { app: processor }
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "2113"
+    spec:
+      containers:
+        - name: processor
+          image: fleet-telemetry:latest
+          args: ["processor"]
+          env:
+            - { name: KAFKA_BROKERS, value: "redpanda:9092" }
+            - { name: KAFKA_GROUP, value: "fleet-processor" }
+            - { name: DATABASE_URL, value: "postgres://fleet:fleet@timescaledb:5432/fleet" }
+            - { name: REDIS_ADDR, value: "redis:6379" }
+            - { name: METRICS_ADDR, value: ":2113" }
+          ports:
+            - { name: metrics, containerPort: 2113 }
+          readinessProbe:
+            httpGet: { path: /healthz, port: 2113 }
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources:
+            requests: { cpu: "200m", memory: "128Mi" }
+            limits: { cpu: "1", memory: "512Mi" }

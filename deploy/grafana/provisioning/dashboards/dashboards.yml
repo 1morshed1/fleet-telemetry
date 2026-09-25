@@ -1,0 +1,11 @@
+# Load any dashboard JSON found in /var/lib/grafana/dashboards on startup.
+apiVersion: 1
+providers:
+  - name: fleet
+    orgId: 1
+    folder: Fleet
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

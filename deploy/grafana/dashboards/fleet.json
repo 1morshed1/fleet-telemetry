@@ -1,0 +1,96 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 0,
+  "title": "Fleet Telemetry",
+  "uid": "fleet-telemetry",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": { "from": "now-15m", "to": "now" },
+  "refresh": "5s",
+  "templating": { "list": [] },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Ingestion throughput (pings/sec)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "expr": "rate(ingestion_pings_received_total[1m])", "legendFormat": "received" },
+        { "refId": "B", "expr": "rate(ingestion_pings_produced_total[1m])", "legendFormat": "produced" },
+        { "refId": "C", "expr": "rate(ingestion_pings_rejected_total[1m])", "legendFormat": "rejected (backpressure)" }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Ingestion queue depth",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "expr": "ingestion_queue_depth", "legendFormat": "queued pings" }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Processor rate (consumed vs written)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "expr": "rate(processor_pings_consumed_total[1m])", "legendFormat": "consumed" },
+        { "refId": "B", "expr": "rate(processor_events_written_total[1m])", "legendFormat": "events written" }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Alerts (per sec)",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "expr": "rate(processor_speed_alerts_total[5m])", "legendFormat": "speed" },
+        { "refId": "B", "expr": "rate(processor_geofence_alerts_total[5m])", "legendFormat": "geofence" }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Avg batch size",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 16 },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "expr": "rate(ingestion_batch_size_sum[5m]) / rate(ingestion_batch_size_count[5m])", "legendFormat": "pings/batch" }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Total events stored",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 16 },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "expr": "processor_events_written_total", "legendFormat": "events" }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "DB / Kafka write errors",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 16 },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "targets": [
+        { "refId": "A", "expr": "processor_db_errors_total", "legendFormat": "db errors" },
+        { "refId": "B", "expr": "ingestion_kafka_write_errors_total", "legendFormat": "kafka errors" }
+      ]
+    }
+  ]
+}
