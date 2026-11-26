@@ -5,7 +5,7 @@
 - How to do **stateful** stream processing (speed from consecutive pings) in a plain Go
   consumer.
 - Why we alert on **transitions** (entry / start-speeding) instead of every ping.
-- How the same job would look in Spark (the plan's original choice).
+- How the same job would look in Spark (the spec's original choice).
 
 ## The problem
 
@@ -77,7 +77,7 @@ if calcSpeed > applicableLimit { /* speeding */ }
 ```
 
 `applicableLimit` is the tightest speed limit among the zones the vehicle is currently in,
-falling back to a default (120 km/h). We compute speed from **positions** (the plan's
+falling back to a default (120 km/h). We compute speed from **positions** (the spec's
 approach) rather than trusting the device's reported speed, because recomputing catches
 spoofed or faulty sensors.
 
@@ -119,7 +119,7 @@ entry only" and "alert on speeding transition only."
 
 ## The Spark reference (for comparison)
 
-The plan's geofencing/speed logic in PySpark Structured Streaming would read the same Kafka
+The spec's geofencing/speed logic in PySpark Structured Streaming would read the same Kafka
 topic and look like this:
 
 ```python

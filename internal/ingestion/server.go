@@ -62,7 +62,7 @@ type Config struct {
 	FlushInterval time.Duration // flush at least this often
 }
 
-// DefaultConfig matches the plan: 500 pings or 100ms, whichever comes first.
+// DefaultConfig matches the spec: 500 pings or 100ms, whichever comes first.
 func DefaultConfig() Config {
 	return Config{QueueSize: 100_000, MaxBatch: 500, FlushInterval: 100 * time.Millisecond}
 }

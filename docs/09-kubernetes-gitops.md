@@ -7,7 +7,7 @@
 - Why stateless vs stateful workloads are deployed differently.
 
 > Scope note: these manifests show the **shape** of a production deployment and run on
-> Minikube. Provisioning real cloud VMs/clusters (Terraform + Ansible in the plan) is out of
+> Minikube. Provisioning real cloud VMs/clusters (Terraform + Ansible in the spec) is out of
 > scope — [ADR-0001](decisions/0001-deviations-from-plan.md) explains why.
 
 ## From Compose to Kubernetes

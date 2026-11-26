@@ -141,8 +141,8 @@ FROM geofence_zones`
 // GeoJSON [lng,lat] order into our [lat,lng] pairs.
 func parsePolygonRing(geoJSON string) ([][2]float64, error) {
 	var g struct {
-		Type        string          `json:"type"`
-		Coordinates [][][2]float64  `json:"coordinates"`
+		Type        string         `json:"type"`
+		Coordinates [][][2]float64 `json:"coordinates"`
 	}
 	if err := json.Unmarshal([]byte(geoJSON), &g); err != nil {
 		return nil, err

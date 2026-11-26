@@ -1,12 +1,15 @@
 # Fleet Telemetry — Real-Time IoT Fleet Management & Geospatial Dashboard
 
+[![CI](https://github.com/1morshed1/fleet-telemetry/actions/workflows/ci.yml/badge.svg)](https://github.com/1morshed1/fleet-telemetry/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A high-throughput system that ingests GPS pings from a simulated vehicle fleet, detects
 **geofence violations** and **speeding** in real time, stores everything in a time-series
 database, and shows it live on a map.
 
-This repo is built as a **learning project**. Every phase has a companion document in
+Every phase has a companion document in
 [`docs/`](docs/) that explains *what* was built, *why* the decisions were made, and the
-trade-offs behind them. Read the docs in order — they are the point.
+trade-offs behind them. Read the docs in order.
 
 ![Live dashboard: 800 vehicles over Berlin, red = geofence/speed violations](docs/images/dashboard.png)
 
@@ -85,3 +88,7 @@ render cleanly; running them on a real cluster is optional (Minikube instruction
 [docs/09](docs/09-kubernetes-gitops.md)).
 
 Built phase by phase — see git history and the per-phase docs for the reasoning behind each step.
+
+## License
+
+[MIT](LICENSE)

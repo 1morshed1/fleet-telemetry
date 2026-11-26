@@ -20,8 +20,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	fleetv1 "github.com/1morshed1/fleet-telemetry/proto/fleet/v1"
 	"github.com/1morshed1/fleet-telemetry/internal/simulator"
+	fleetv1 "github.com/1morshed1/fleet-telemetry/proto/fleet/v1"
 )
 
 func main() {

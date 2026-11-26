@@ -57,7 +57,7 @@ recently-changed buckets, so the summary is cheap to maintain and instant to rea
 
 ### A gotcha we hit
 
-The plan's aggregate included `ST_MakeLine(location ORDER BY time)` to precompute each route
+The spec's aggregate included `ST_MakeLine(location ORDER BY time)` to precompute each route
 as a line. **Continuous aggregates don't allow ordered-set aggregates** (anything with
 `ORDER BY` inside the aggregate). So we dropped route geometry from the aggregate and build it
 **on demand** in the dashboard API instead (`ST_MakeLine` over a bounded time range is cheap

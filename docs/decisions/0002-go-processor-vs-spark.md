@@ -5,7 +5,7 @@
 
 ## Context
 
-The plan uses Apache Spark Structured Streaming for the geofencing and speed-detection
+The spec uses Apache Spark Structured Streaming for the geofencing and speed-detection
 stage. Spark is the industry default for large-scale stream/batch processing. But for this
 project it carries real costs:
 
@@ -22,7 +22,7 @@ project it carries real costs:
 
 Implement the processing stage as a **Go Kafka consumer**:
 
-- Geofencing via `github.com/uber/h3-go` (same H3 algorithm the plan's PySpark uses).
+- Geofencing via `github.com/uber/h3-go` (same H3 algorithm the spec's PySpark uses).
 - Speed detection by keeping the last ping per vehicle in an in-memory map and computing the
   haversine distance / time delta.
 - Writes to TimescaleDB via `pgx`, publishes live positions to Redis.

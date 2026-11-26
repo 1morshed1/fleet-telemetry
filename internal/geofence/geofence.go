@@ -18,8 +18,8 @@ const DefaultResolution = 9
 type Zone struct {
 	ID         int
 	Name       string
-	Type       string     // restricted | warehouse | delivery_area
-	SpeedLimit float64    // km/h; 0 means "no explicit limit"
+	Type       string       // restricted | warehouse | delivery_area
+	SpeedLimit float64      // km/h; 0 means "no explicit limit"
 	Ring       [][2]float64 // polygon exterior ring as [lat, lng] pairs
 }
 

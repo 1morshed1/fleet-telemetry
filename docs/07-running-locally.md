@@ -67,7 +67,7 @@ docker compose down -v    # also wipe the TimescaleDB volume (fresh DB next time
 ## Benchmarking (the simulator is the load test)
 
 There's no separate load tool — raise `VEHICLES` and watch the metrics. The questions to
-answer, from the plan:
+answer, from the spec:
 
 1. **How many vehicles before Kafka lag grows without bound?**
    Watch `rate(processor_pings_consumed_total[1m])` vs the simulator's send rate, and Redpanda
@@ -81,8 +81,8 @@ answer, from the plan:
    Run the same `/vehicles/{id}/history` query against 1 day / 1 week / 1 month of data (let it
    run, or backfill). Chunk exclusion should keep it roughly flat per unit of time scanned.
 
-Record your numbers here as you find them — that table is exactly what an interviewer wants to
-see.
+Record your numbers here as you find them — that table is the
+evidence the system performs.
 
 ## Gotchas we actually hit (and fixed)
 

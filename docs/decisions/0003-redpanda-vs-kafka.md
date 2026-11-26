@@ -5,7 +5,7 @@
 
 ## Context
 
-The plan says "Apache Kafka." Classic Kafka in Docker means:
+The spec says "Apache Kafka." Classic Kafka in Docker means:
 - A **Zookeeper** container (older setups) or KRaft-mode config.
 - A JVM-based broker that is slow to start and heavy on memory.
 - Fiddly `advertised.listeners` configuration to make it reachable from both inside the

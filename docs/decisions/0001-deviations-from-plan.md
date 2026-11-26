@@ -1,11 +1,11 @@
-# ADR-0001: Deviations from the original plan
+# ADR-0001: Deviations from the original spec
 
 - **Status:** Accepted
 - **Date:** 2026-09-25
 
 ## Context
 
-The project started from `plan.md`, an ambitious spec calling for Go + gRPC ingestion,
+The project started from an ambitious original spec calling for Go + gRPC ingestion,
 Kafka, **Apache Spark Structured Streaming** for processing, TimescaleDB + PostGIS + H3 for
 storage/geospatial, a Go dashboard, and full Kubernetes + ArgoCD + Ansible + Terraform
 deployment targeting **millions of pings/sec**.
@@ -13,7 +13,7 @@ deployment targeting **millions of pings/sec**.
 That plan is a great *north star*, but building all of it exactly as written would produce
 something that is hard to run, hard to learn from, and mostly untested. The goal of this
 repo is a **working system you can run on a laptop and actually understand**, while still
-demonstrating every core concept the plan is about.
+demonstrating every core concept the spec is about.
 
 ## Decisions
 

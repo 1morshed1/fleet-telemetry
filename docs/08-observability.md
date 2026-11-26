@@ -88,7 +88,7 @@ where to look; logs tell you **what**. You need both.
 
 ## Traces (documented, not wired)
 
-The plan lists **Jaeger** for distributed tracing and **Loki** for log aggregation. They're the
+The spec lists **Jaeger** for distributed tracing and **Loki** for log aggregation. They're the
 natural next step but add containers and instrumentation without changing the core lessons, so
 they're left as an exercise:
 

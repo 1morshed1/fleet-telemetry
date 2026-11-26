@@ -33,7 +33,7 @@ code but the reasoning. Each one is standalone but they build on each other.
 
 ## Decision Records
 
-- [ADR-0001: Deviations from the original plan](decisions/0001-deviations-from-plan.md)
+- [ADR-0001: Deviations from the original spec](decisions/0001-deviations-from-plan.md)
 - [ADR-0002: Go processor instead of Spark](decisions/0002-go-processor-vs-spark.md)
 - [ADR-0003: Redpanda instead of Apache Kafka + Zookeeper](decisions/0003-redpanda-vs-kafka.md)
 - [ADR-0004: Keep best-effort external calls off the hot path](decisions/0004-redis-hot-path-stall.md)
